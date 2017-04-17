@@ -8,13 +8,6 @@ In this lab we are going to use two VMs which are hosted on Cisco's UCS servers.
 
 ![Lab Setup](https://github.com/contiv/dockercon2017/blob/master/lab/Lab-Setup.png?raw=true)
 
-### RDP Access
-URL: dmz-rdesktop.cisco.com:3390
-Username: pod1u1
-Password: Gir0DItalia.321
-
-Run SecureCRT, and click on pod1. 
-
 ### Contiv Installation
 
 The Contiv Docker Swarm installer is launched from a host external to the cluster.  All the nodes must be accessible to the Contiv Ansible-based installer host through SSH.
