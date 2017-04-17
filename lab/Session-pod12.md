@@ -42,7 +42,7 @@ tar -zxvf contiv-1.0.0.tgz
 
 
 
-#### Step 3: Create config file to install contiv
+#### Step 3a: Create config file to install contiv
 
 ```
 cat << EOF > ~/cfg.yml
@@ -58,25 +58,12 @@ EOF
 
 ```
 
-#### Step 4: Install contiv on pod12-srv1 and pod12-srv2
+#### Step 3b: Install contiv on pod12-srv1 and pod12-srv2
 
 ```
 cd ~/contiv-1.0.0
 
 ./install/ansible/install_swarm.sh -f ~/cfg.yml -e ~/.ssh/id_rsa -u root -i
-
-```
-
-Some examples of installer:
-
-```
-Examples:
-1. Uninstall Contiv and Docker Swarm on hosts specified by cfg.yml.
-./install/ansible/uninstall_swarm.sh -f cfg.yml -e ~/ssh_key -u admin -i
-2. Uninstall Contiv and Docker Swarm on hosts specified by cfg.yml for an ACI setup.
-./install/ansible/uninstall_swarm.sh -f cfg.yml -e ~/ssh_key -u admin -i -m aci
-3. Uninstall Contiv and Docker Swarm on hosts specified by cfg.yml for an ACI setup, remove all containers and Contiv etcd state
-./install/ansible/uninstall_swarm.sh -f cfg.yml -e ~/ssh_key -u admin -i -m aci -r
 
 ```
 
