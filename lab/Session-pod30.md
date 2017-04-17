@@ -40,6 +40,14 @@ tar -zxvf contiv-1.0.0.tgz
 
 ```
 
+Update the uninstall script
+
+```
+cd contiv-1.0.0/install/ansible
+wget https://github.com/contiv/install/releases/download/1.0.0/uninstall.sh
+chmod u+x uninstall.sh
+```
+
 
 
 #### Step 3a: Create config file to install contiv
