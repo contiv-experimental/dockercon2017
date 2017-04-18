@@ -10,10 +10,15 @@ echo "Creating $1 POD files"
 echo "-----------------------------"
 
 for (( c=1; c<=$1; c++ ))
-do  
-   echo "Creating file Session-pod$c.md for pod$c"
-   sed -i -e 's/podxx/pod'"$c"'/g' Session-podxx.md
-   mv Session-podxx.md Session-pod$c.md
+do
+	pod_num=$c	
+	if [[ $(( c / 10 )) == 0 ]]; then 
+		pod_num="0${c}"
+	fi
+
+   echo "Creating file Session-pod$pod_num.md for pod$pod_num"
+   sed -i -e 's/podxx/pod'"$pod_num"'/g' Session-podxx.md
+   mv Session-podxx.md Session-pod$pod_num.md
    mv Session-podxx.md-e Session-podxx.md
 done
 

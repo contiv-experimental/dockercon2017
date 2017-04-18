@@ -24,9 +24,9 @@ mkdir .ssh && chmod 700 .ssh
 
 ssh-keygen -t rsa -f ~/.ssh/id_rsa  -N ""
 
-sshpass -p cisco.123 ssh-copy-id -i ~/.ssh/id_rsa.pub root@pod3-srv1.ecatsrtpdmz.cisco.com -o StrictHostKeyChecking=no
+sshpass -p cisco.123 ssh-copy-id -i ~/.ssh/id_rsa.pub root@pod07-srv1.ecatsrtpdmz.cisco.com -o StrictHostKeyChecking=no
 
-sshpass -p cisco.123 ssh-copy-id -i ~/.ssh/id_rsa.pub root@pod3-srv2.ecatsrtpdmz.cisco.com -o StrictHostKeyChecking=no
+sshpass -p cisco.123 ssh-copy-id -i ~/.ssh/id_rsa.pub root@pod07-srv2.ecatsrtpdmz.cisco.com -o StrictHostKeyChecking=no
 
 ```
 
@@ -55,18 +55,18 @@ chmod u+x uninstall.sh
 ```
 cat << EOF > ~/cfg.yml
 CONNECTION_INFO:
-      pod3-srv1.ecatsrtpdmz.cisco.com:
+      pod07-srv1.ecatsrtpdmz.cisco.com:
         role: master
         control: eth0
         data: eth1
-      pod3-srv2.ecatsrtpdmz.cisco.com:
+      pod07-srv2.ecatsrtpdmz.cisco.com:
         control: eth0
         data: eth1
 EOF
 
 ```
 
-#### Step 3b: Install contiv on pod3-srv1 and pod3-srv2
+#### Step 3b: Install contiv on pod07-srv1 and pod07-srv2
 
 ```
 cd ~/contiv-1.0.0
@@ -76,7 +76,7 @@ cd ~/contiv-1.0.0
 ```
 
 **Note**:
-- For next set of steps, We will be logging in on pod3-srv1 and pod3-srv2.
+- For next set of steps, We will be logging in on pod07-srv1 and pod07-srv2.
 
 
 #### Step 4: Hello world Docker swarm.
@@ -85,24 +85,24 @@ As a part of this contiv installation, we install docker swarm for you.
 
 To verify docker swarm cluster, let us perform following steps.
 **Note**:
-- Make sure you execute following step on pod3-srv1 as well as pod3-srv2
+- Make sure you execute following step on pod07-srv1 as well as pod07-srv2
 
 
 ```
-On pod3-srv1:
+On pod07-srv1:
 
-[root@pod3-srv1 ~]# export DOCKER_HOST=tcp://pod3-srv1.ecatsrtpdmz.cisco.com:2375
+[root@pod07-srv1 ~]# export DOCKER_HOST=tcp://pod07-srv1.ecatsrtpdmz.cisco.com:2375
 
-On pod3-srv2:
+On pod07-srv2:
 
-[root@pod3-srv2 ~]# export DOCKER_HOST=tcp://pod3-srv1.ecatsrtpdmz.cisco.com:2375
+[root@pod07-srv2 ~]# export DOCKER_HOST=tcp://pod07-srv1.ecatsrtpdmz.cisco.com:2375
 
 ```
 
 Now verify that swarm is running successfully or not.
 
 ```
-[root@pod3-srv2 ~]# docker info
+[root@pod07-srv2 ~]# docker info
 Containers: 6
  Running: 6
  Paused: 0
@@ -113,7 +113,7 @@ Role: primary
 Strategy: spread
 Filters: health, port, containerslots, dependency, affinity, constraint
 Nodes: 2
- pod3-srv1.ecatsrtpdmz.cisco.com: 10.0.236.45:2385
+ pod07-srv1.ecatsrtpdmz.cisco.com: 10.0.236.45:2385
   └ ID: 6YBU:MWOG:QCWK:34U3:JUUT:BBP7:LWEH:UHXW:L4ES:SOVZ:AIMA:LD5K
   └ Status: Healthy
   └ Containers: 4 (4 Running, 0 Paused, 0 Stopped)
@@ -122,7 +122,7 @@ Nodes: 2
   └ Labels: kernelversion=3.10.0-514.6.2.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), storagedriver=devicemapper
   └ UpdatedAt: 2017-04-12T00:10:22Z
   └ ServerVersion: 1.12.6
- pod3-srv2.ecatsrtpdmz.cisco.com: 10.0.236.77:2385
+ pod07-srv2.ecatsrtpdmz.cisco.com: 10.0.236.77:2385
   └ ID: X46T:2DNF:MZGH:W5S4:VBLM:ENJN:DUV4:IOJQ:MLJL:KK5E:LW7D:XADB
   └ Status: Healthy
   └ Containers: 2 (2 Running, 0 Paused, 0 Stopped)
@@ -144,7 +144,7 @@ Operating System: linux
 Architecture: amd64
 CPUs: 2
 Total Memory: 16.04 GiB
-Name: pod3-srv1.ecatsrtpdmz.cisco.com
+Name: pod07-srv1.ecatsrtpdmz.cisco.com
 Docker Root Dir: 
 Debug Mode (client): false
 Debug Mode (server): false
@@ -161,7 +161,7 @@ Docker swarm with 2 nodes is running successfully.
 To check etcd cluster health
 
 ```
-[root@pod3-srv1 ~]# etcdctl cluster-health
+[root@pod07-srv1 ~]# etcdctl cluster-health
 member 3617459f1e4ec4e4 is healthy: got healthy result from http://10.0.236.45:2379
 cluster is healthy
 
@@ -170,7 +170,7 @@ cluster is healthy
 To check netplugin and netmaster is running successfully.
 
 ```
-[root@pod3-srv1 ~]# sudo service netmaster status
+[root@pod07-srv1 ~]# sudo service netmaster status
 Redirecting to /bin/systemctl status  netmaster.service
 ● netmaster.service - Netmaster
    Loaded: loaded (/etc/systemd/system/netmaster.service; enabled; vendor preset: disabled)
@@ -179,20 +179,20 @@ Redirecting to /bin/systemctl status  netmaster.service
    CGroup: /system.slice/netmaster.service
            └─16103 /usr/bin/netmaster --cluster-mode docker -cluster-store etcd://10.0.236.45:2379
 
-Apr 11 20:09:47 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:47.940208005" level=info msg="Connecting to RPC server: 10.0.236.77:9002"
-Apr 11 20:09:47 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:47.943741660" level=info msg="Connected to RPC server: 10.0.236.77:9002"
-Apr 11 20:09:47 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:47.944169893" level=info msg="Registered node: &{HostAddr:10.0.236.77 HostPort:9002}"
-Apr 11 20:09:47 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:47.947737457" level=info msg="Sending service add event: {ServiceName:netplugin Role: Version: TTL:10 HostAddr:10.0.236.77 Port:90...mz.cisco.com}"
-Apr 11 20:09:48 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:48.045712382" level=info msg="Connecting to RPC server: 10.0.236.77:9003"
-Apr 11 20:09:48 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:48.046161489" level=info msg="Connected to RPC server: 10.0.236.77:9003"
-Apr 11 20:09:48 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:48.046981346" level=info msg="Registered node: &{HostAddr:10.0.236.77 HostPort:9003}"
-Apr 11 20:09:50 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:50.268556177" level=info msg="Registered node: &{HostAddr:10.0.236.77 HostPort:9003}"
-Apr 11 20:09:50 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:50.269670879" level=info msg="Registered node: &{HostAddr:10.0.236.77 HostPort:9002}"
-Apr 11 20:10:04 pod3-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:10:04.142642185" level=info msg="Received EndpointUpdateRequest {{IPAddress: ContainerID: Labels:map[] Tenant: Network: Event: Endpoi...CommonName:}}"
+Apr 11 20:09:47 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:47.940208005" level=info msg="Connecting to RPC server: 10.0.236.77:9002"
+Apr 11 20:09:47 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:47.943741660" level=info msg="Connected to RPC server: 10.0.236.77:9002"
+Apr 11 20:09:47 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:47.944169893" level=info msg="Registered node: &{HostAddr:10.0.236.77 HostPort:9002}"
+Apr 11 20:09:47 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:47.947737457" level=info msg="Sending service add event: {ServiceName:netplugin Role: Version: TTL:10 HostAddr:10.0.236.77 Port:90...mz.cisco.com}"
+Apr 11 20:09:48 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:48.045712382" level=info msg="Connecting to RPC server: 10.0.236.77:9003"
+Apr 11 20:09:48 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:48.046161489" level=info msg="Connected to RPC server: 10.0.236.77:9003"
+Apr 11 20:09:48 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:48.046981346" level=info msg="Registered node: &{HostAddr:10.0.236.77 HostPort:9003}"
+Apr 11 20:09:50 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:50.268556177" level=info msg="Registered node: &{HostAddr:10.0.236.77 HostPort:9003}"
+Apr 11 20:09:50 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:09:50.269670879" level=info msg="Registered node: &{HostAddr:10.0.236.77 HostPort:9002}"
+Apr 11 20:10:04 pod07-srv1.ecatsrtpdmz.cisco.com netmaster[16103]: time="Apr 11 20:10:04.142642185" level=info msg="Received EndpointUpdateRequest {{IPAddress: ContainerID: Labels:map[] Tenant: Network: Event: Endpoi...CommonName:}}"
 Hint: Some lines were ellipsized, use -l to show in full.
 
 
-[root@pod3-srv1 ~]# sudo service netplugin status
+[root@pod07-srv1 ~]# sudo service netplugin status
 Redirecting to /bin/systemctl status  netplugin.service
 ● netplugin.service - Netplugin
    Loaded: loaded (/etc/systemd/system/netplugin.service; enabled; vendor preset: disabled)
@@ -201,16 +201,16 @@ Redirecting to /bin/systemctl status  netplugin.service
    CGroup: /system.slice/netplugin.service
            └─15613 /usr/bin/netplugin -plugin-mode docker -vlan-if eth1 -vtep-ip 10.0.236.45 -ctrl-ip 10.0.236.45 -cluster-store etcd://10.0.236.45:2379
 
-Apr 11 20:09:47 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:09:47.938448472" level=info msg="Node add event for {{ServiceName:netplugin.vtep Role: Version: TTL:10 HostAddr:10.0.236.77 Port:4789 Hostname:}}"
-Apr 11 20:09:47 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:09:47.938461859" level=info msg="CreatePeerHost for {HostAddr:10.0.236.77 Port:4789}"
-Apr 11 20:09:47 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:09:47.938486313" level=info msg="Creating VTEP intf vxif10023677 for IP 10.0.236.77"
-Apr 11 20:09:48 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:09:48.243831933" level=info msg="Received Add VTEP port(2), Remote IP: 10.0.236.77"
-Apr 11 20:10:03 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:03.339015655" level=error msg="Error getting docknet list. Err: Key not found [github.com/contiv/netplugin/state.(*EtcdStateDriver...river.go 155]"
-Apr 11 20:10:04 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:04.137013811" level=info msg="Returning network name host for ID e8be04ef7ab7a4e60aa9fe099d0f5ab5f02d202a4500cb660e897a3a2db5117b"
-Apr 11 20:10:04 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:04.137055877" level=info msg="Sending Endpoint update request to master: {&{IPAddress: ContainerID: Labels:map[] Tenant: Network: ...CommonName:}}"
-Apr 11 20:10:04 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:04.138157544" level=info msg="Making REST request to url: http://10.0.236.45:9999/plugin/updateEndpoint"
-Apr 11 20:10:04 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:04.143355825" level=info msg="Results for (http://10.0.236.45:9999/plugin/updateEndpoint): &{IPAddress:}
-Apr 11 20:10:04 pod3-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: "
+Apr 11 20:09:47 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:09:47.938448472" level=info msg="Node add event for {{ServiceName:netplugin.vtep Role: Version: TTL:10 HostAddr:10.0.236.77 Port:4789 Hostname:}}"
+Apr 11 20:09:47 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:09:47.938461859" level=info msg="CreatePeerHost for {HostAddr:10.0.236.77 Port:4789}"
+Apr 11 20:09:47 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:09:47.938486313" level=info msg="Creating VTEP intf vxif10023677 for IP 10.0.236.77"
+Apr 11 20:09:48 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:09:48.243831933" level=info msg="Received Add VTEP port(2), Remote IP: 10.0.236.77"
+Apr 11 20:10:03 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:03.339015655" level=error msg="Error getting docknet list. Err: Key not found [github.com/contiv/netplugin/state.(*EtcdStateDriver...river.go 155]"
+Apr 11 20:10:04 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:04.137013811" level=info msg="Returning network name host for ID e8be04ef7ab7a4e60aa9fe099d0f5ab5f02d202a4500cb660e897a3a2db5117b"
+Apr 11 20:10:04 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:04.137055877" level=info msg="Sending Endpoint update request to master: {&{IPAddress: ContainerID: Labels:map[] Tenant: Network: ...CommonName:}}"
+Apr 11 20:10:04 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:04.138157544" level=info msg="Making REST request to url: http://10.0.236.45:9999/plugin/updateEndpoint"
+Apr 11 20:10:04 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: time="Apr 11 20:10:04.143355825" level=info msg="Results for (http://10.0.236.45:9999/plugin/updateEndpoint): &{IPAddress:}
+Apr 11 20:10:04 pod07-srv1.ecatsrtpdmz.cisco.com netplugin[15613]: "
 Hint: Some lines were ellipsized, use -l to show in full.
 
 
@@ -221,7 +221,7 @@ on top of REST interface.
 
 
 ```
-[root@pod3-srv1 ~]# netctl version
+[root@pod07-srv1 ~]# netctl version
 Client Version:
 Version: 1.0.0
 GitCommit: aa79db4
@@ -231,13 +231,13 @@ Server Version:
 Version: 1.0.0
 GitCommit: e820dd7
 BuildTime: 02-17-2017.23-55-08.UTC
-[root@pod3-srv1 ~]# 
+[root@pod07-srv1 ~]# 
 
 ```
 --------------------------------------------------------------------------------------------
 
 ```
-[root@pod3-srv1 ~]# ifconfig docker0
+[root@pod07-srv1 ~]# ifconfig docker0
 docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
         inet 172.17.0.1  netmask 255.255.0.0  broadcast 0.0.0.0
         ether 02:42:eb:69:4b:d0  txqueuelen 0  (Ethernet)
@@ -246,7 +246,7 @@ docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
         TX packets 0  bytes 0 (0.0 B)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
-[root@pod3-srv1 ~]# ifconfig eth1
+[root@pod07-srv1 ~]# ifconfig eth1
 eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet6 fe80::9a0:86d9:2017:5c43  prefixlen 64  scopeid 0x20<link>
         ether 00:50:56:8c:4e:6b  txqueuelen 1000  (Ethernet)
@@ -255,7 +255,7 @@ eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         TX packets 389896  bytes 69068232 (65.8 MiB)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
-[root@pod3-srv1 ~]# ifconfig eth0
+[root@pod07-srv1 ~]# ifconfig eth0
 eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 10.0.236.45  netmask 255.255.255.0  broadcast 10.0.236.255
         inet6 fe80::250:56ff:fe0c:129  prefixlen 64  scopeid 0x20<link>
@@ -299,16 +299,16 @@ that schedules regular docker containers e.g. Nomad or Mesos docker containerize
 Let's examine the networking a container gets upon vanilla run
 
 ```
-[root@pod3-srv1 ~]# docker network ls
+[root@pod07-srv1 ~]# docker network ls
 NETWORK ID          NAME                                      DRIVER              SCOPE
-4c7a511c1131        pod3-srv1.ecatsrtpdmz.cisco.com/bridge   bridge              local               
-e8be04ef7ab7        pod3-srv1.ecatsrtpdmz.cisco.com/host     host                local               
-632ec424d389        pod3-srv1.ecatsrtpdmz.cisco.com/none     null                local               
-ffa83d536aba        pod3-srv2.ecatsrtpdmz.cisco.com/bridge   bridge              local               
-43f4fb17d806        pod3-srv2.ecatsrtpdmz.cisco.com/host     host                local               
-dce44a32c67d        pod3-srv2.ecatsrtpdmz.cisco.com/none     null                local  
+4c7a511c1131        pod07-srv1.ecatsrtpdmz.cisco.com/bridge   bridge              local               
+e8be04ef7ab7        pod07-srv1.ecatsrtpdmz.cisco.com/host     host                local               
+632ec424d389        pod07-srv1.ecatsrtpdmz.cisco.com/none     null                local               
+ffa83d536aba        pod07-srv2.ecatsrtpdmz.cisco.com/bridge   bridge              local               
+43f4fb17d806        pod07-srv2.ecatsrtpdmz.cisco.com/host     host                local               
+dce44a32c67d        pod07-srv2.ecatsrtpdmz.cisco.com/none     null                local  
 
-[root@pod3-srv1 ~]# docker run -itd --name=vanilla-c alpine /bin/sh
+[root@pod07-srv1 ~]# docker run -itd --name=vanilla-c alpine /bin/sh
 36f04a36338c8b1e6c6cb25b621e475eb940ba36fe058305caa5c02ca0b02c3f
 
 ```
@@ -316,15 +316,15 @@ dce44a32c67d        pod3-srv2.ecatsrtpdmz.cisco.com/none     null               
 **Note**:
 - Please run `docker ps` and check NAMES column to find that this
 container got scheduled by docker swarm on which node. Here you can see that this container
-got scheduled on pod3-srv2 node.
+got scheduled on pod07-srv2 node.
 
 ```
-[root@pod3-srv1 ~]# docker ps
+[root@pod07-srv1 ~]# docker ps
 CONTAINER ID        IMAGE                            COMMAND                  CREATED             STATUS              PORTS               NAMES
-36f04a36338c        alpine                           "/bin/sh"                15 seconds ago      Up 12 seconds                           pod3-srv2.ecatsrtpdmz.cisco.com/vanilla-c
-7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   5 minutes ago       Up 5 minutes                            pod3-srv1.ecatsrtpdmz.cisco.com/auth-proxy
-e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  7 minutes ago       Up 7 minutes                            pod3-srv2.ecatsrtpdmz.cisco.com/etcd
-228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  7 minutes ago       Up 7 minutes                            pod3-srv1.ecatsrtpdmz.cisco.com/etcd
+36f04a36338c        alpine                           "/bin/sh"                15 seconds ago      Up 12 seconds                           pod07-srv2.ecatsrtpdmz.cisco.com/vanilla-c
+7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   5 minutes ago       Up 5 minutes                            pod07-srv1.ecatsrtpdmz.cisco.com/auth-proxy
+e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  7 minutes ago       Up 7 minutes                            pod07-srv2.ecatsrtpdmz.cisco.com/etcd
+228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  7 minutes ago       Up 7 minutes                            pod07-srv1.ecatsrtpdmz.cisco.com/etcd
 
 ```
 
@@ -335,7 +335,7 @@ More importantly it is allocated an IP address from default docker bridge docker
 Let us inspect one of the network
 
 ```
-[root@pod3-srv2 ~]# docker network inspect pod3-srv1.ecatsrtpdmz.cisco.com/bridge
+[root@pod07-srv2 ~]# docker network inspect pod07-srv1.ecatsrtpdmz.cisco.com/bridge
 [
     {
         "Name": "bridge",
@@ -366,7 +366,7 @@ Let us inspect one of the network
     }
 ]
 
-[root@pod3-srv2 ~]# docker inspect --format '{{.NetworkSettings.IPAddress}}' vanilla-c
+[root@pod07-srv2 ~]# docker inspect --format '{{.NetworkSettings.IPAddress}}' vanilla-c
 172.17.0.2
 
 ```
@@ -374,9 +374,9 @@ Let us inspect one of the network
 The other pair of veth interface is put into the container with the name `eth0`
 
 ```
-[root@pod3-srv2 ~]# docker inspect --format '{{.NetworkSettings.IPAddress}}' vanilla-c
+[root@pod07-srv2 ~]# docker inspect --format '{{.NetworkSettings.IPAddress}}' vanilla-c
 172.17.0.2
-[root@pod3-srv2 ~]# docker exec -it vanilla-c /bin/sh
+[root@pod07-srv2 ~]# docker exec -it vanilla-c /bin/sh
 / # ifconfig eth0
 eth0      Link encap:Ethernet  HWaddr 02:42:AC:11:00:02  
           inet addr:172.17.0.2  Bcast:0.0.0.0  Mask:255.255.0.0
@@ -395,7 +395,7 @@ The Port NATing on the host is done using iptables, which can be seen as a
 MASQUERADE rule for outbound traffic for `172.17.0.0/16`
 
 ```
-[root@pod3-srv2 ~]# sudo iptables -t nat -L -n
+[root@pod07-srv2 ~]# sudo iptables -t nat -L -n
 
 ```
 
@@ -411,24 +411,24 @@ Let's use the same example as above to spin up two containers on the two differe
 #### 1. Create a multi-host network
 
 ```
-[root@pod3-srv2 ~]# netctl net create --subnet=30.1.2.0/24 contiv-net
+[root@pod07-srv2 ~]# netctl net create --subnet=30.1.2.0/24 contiv-net
 Creating network default:contiv-net
-[root@pod3-srv2 ~]# netctl network ls 
+[root@pod07-srv2 ~]# netctl network ls 
 Tenant   Network     Nw Type  Encap type  Packet tag  Subnet       Gateway  IPv6Subnet  IPv6Gateway
 ------   -------     -------  ----------  ----------  -------      ------   ----------  -----------
 default  contiv-net  data     vxlan       0           30.1.2.0/24     
 
-[root@pod3-srv2 ~]# docker network ls
+[root@pod07-srv2 ~]# docker network ls
 NETWORK ID          NAME                                      DRIVER              SCOPE
 d120aeb0010b        contiv-net                                netplugin           global              
-4c7a511c1131        pod3-srv1.ecatsrtpdmz.cisco.com/bridge   bridge              local               
-e8be04ef7ab7        pod3-srv1.ecatsrtpdmz.cisco.com/host     host                local               
-632ec424d389        pod3-srv1.ecatsrtpdmz.cisco.com/none     null                local               
-ffa83d536aba        pod3-srv2.ecatsrtpdmz.cisco.com/bridge   bridge              local               
-43f4fb17d806        pod3-srv2.ecatsrtpdmz.cisco.com/host     host                local               
-dce44a32c67d        pod3-srv2.ecatsrtpdmz.cisco.com/none     null                local       
+4c7a511c1131        pod07-srv1.ecatsrtpdmz.cisco.com/bridge   bridge              local               
+e8be04ef7ab7        pod07-srv1.ecatsrtpdmz.cisco.com/host     host                local               
+632ec424d389        pod07-srv1.ecatsrtpdmz.cisco.com/none     null                local               
+ffa83d536aba        pod07-srv2.ecatsrtpdmz.cisco.com/bridge   bridge              local               
+43f4fb17d806        pod07-srv2.ecatsrtpdmz.cisco.com/host     host                local               
+dce44a32c67d        pod07-srv2.ecatsrtpdmz.cisco.com/none     null                local       
 
-[root@pod3-srv2 ~]# docker network inspect contiv-net
+[root@pod07-srv2 ~]# docker network inspect contiv-net
 [
     {
         "Name": "contiv-net",
@@ -463,22 +463,22 @@ dce44a32c67d        pod3-srv2.ecatsrtpdmz.cisco.com/none     null               
 You can now run a new container belonging to `contiv-net` network:
 
 ```
-[root@pod3-srv2 ~]# docker run -itd --name=contiv-c1 --net=contiv-net alpine /bin/sh
+[root@pod07-srv2 ~]# docker run -itd --name=contiv-c1 --net=contiv-net alpine /bin/sh
 e0d473622395e42c50c4e18ad96fc914afaec2e20b7b4e7c4c97a3328fcae765
 
-[root@pod3-srv2 ~]# docker run -itd --name=contiv-c2 --net=contiv-net alpine /bin/sh
+[root@pod07-srv2 ~]# docker run -itd --name=contiv-c2 --net=contiv-net alpine /bin/sh
 0c9ffe9225e9084b72c996759ed936016271c58370e37e5dc315eb9fe514102e
 
-[root@pod3-srv2 ~]# docker ps
+[root@pod07-srv2 ~]# docker ps
 CONTAINER ID        IMAGE                            COMMAND                  CREATED              STATUS              PORTS               NAMES
-0c9ffe9225e9        alpine                           "/bin/sh"                13 seconds ago       Up 9 seconds                            pod3-srv1.ecatsrtpdmz.cisco.com/contiv-c2
-e0d473622395        alpine                           "/bin/sh"                About a minute ago   Up About a minute                       pod3-srv2.ecatsrtpdmz.cisco.com/contiv-c1
-36f04a36338c        alpine                           "/bin/sh"                4 minutes ago        Up 4 minutes                            pod3-srv2.ecatsrtpdmz.cisco.com/vanilla-c
-7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   10 minutes ago       Up 10 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/auth-proxy
-e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  12 minutes ago       Up 11 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/etcd
-228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  12 minutes ago       Up 12 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/etcd
+0c9ffe9225e9        alpine                           "/bin/sh"                13 seconds ago       Up 9 seconds                            pod07-srv1.ecatsrtpdmz.cisco.com/contiv-c2
+e0d473622395        alpine                           "/bin/sh"                About a minute ago   Up About a minute                       pod07-srv2.ecatsrtpdmz.cisco.com/contiv-c1
+36f04a36338c        alpine                           "/bin/sh"                4 minutes ago        Up 4 minutes                            pod07-srv2.ecatsrtpdmz.cisco.com/vanilla-c
+7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   10 minutes ago       Up 10 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/auth-proxy
+e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  12 minutes ago       Up 11 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/etcd
+228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  12 minutes ago       Up 12 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/etcd
 
-[root@pod3-srv2 ~]# docker exec -it contiv-c2 /bin/sh
+[root@pod07-srv2 ~]# docker exec -it contiv-c2 /bin/sh
 / # ping contiv-c1
 PING contiv-c1 (30.1.2.1): 56 data bytes
 64 bytes from 30.1.2.1: seq=0 ttl=64 time=1.899 ms
@@ -508,9 +508,9 @@ driver is same as that of `overlay` driver from Docker.
 Let's create a new tenant space.
 
 ```
-[root@pod3-srv2 ~]# netctl tenant create blue
+[root@pod07-srv2 ~]# netctl tenant create blue
 Creating tenant: blue
-[root@pod3-srv2 ~]# netctl tenant ls 
+[root@pod07-srv2 ~]# netctl tenant ls 
 Name     
 ------   
 default  
@@ -521,9 +521,9 @@ blue
 After the tenant is created, we can create network within in tenant `blue` and run containers.
 
 ```
-[root@pod3-srv2 ~]# netctl net create -t blue --subnet=40.1.2.0/24 contiv-net 
+[root@pod07-srv2 ~]# netctl net create -t blue --subnet=40.1.2.0/24 contiv-net 
 Creating network blue:contiv-net
-[root@pod3-srv2 ~]# netctl net ls -t blue
+[root@pod07-srv2 ~]# netctl net ls -t blue
 Tenant  Network     Nw Type  Encap type  Packet tag  Subnet       Gateway  IPv6Subnet  IPv6Gateway
 ------  -------     -------  ----------  ----------  -------      ------   ----------  -----------
 blue    contiv-net  data     vxlan       0           40.1.2.0/24                       
@@ -533,41 +533,41 @@ blue    contiv-net  data     vxlan       0           40.1.2.0/24
 Next, we can run containers belonging to this tenant
 
 ```
-[root@pod3-srv2 ~]# docker run -itd --name=contiv-blue-c1 --net="contiv-net/blue" alpine /bin/sh
+[root@pod07-srv2 ~]# docker run -itd --name=contiv-blue-c1 --net="contiv-net/blue" alpine /bin/sh
 3b52a958a5ed15126bc064968a6157711677ee786c132e39ecbcf9e9854eb927
-[root@pod3-srv2 ~]# docker ps 
+[root@pod07-srv2 ~]# docker ps 
 CONTAINER ID        IMAGE                            COMMAND                  CREATED             STATUS              PORTS               NAMES
-3b52a958a5ed        alpine                           "/bin/sh"                7 seconds ago       Up 2 seconds                            pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
-0c9ffe9225e9        alpine                           "/bin/sh"                4 minutes ago       Up 4 minutes                            pod3-srv1.ecatsrtpdmz.cisco.com/contiv-c2
-e0d473622395        alpine                           "/bin/sh"                5 minutes ago       Up 5 minutes                            pod3-srv2.ecatsrtpdmz.cisco.com/contiv-c1
-36f04a36338c        alpine                           "/bin/sh"                9 minutes ago       Up 8 minutes                            pod3-srv2.ecatsrtpdmz.cisco.com/vanilla-c
-7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   14 minutes ago      Up 14 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/auth-proxy
-e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  16 minutes ago      Up 16 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/etcd
-228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  16 minutes ago      Up 16 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/etc
+3b52a958a5ed        alpine                           "/bin/sh"                7 seconds ago       Up 2 seconds                            pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
+0c9ffe9225e9        alpine                           "/bin/sh"                4 minutes ago       Up 4 minutes                            pod07-srv1.ecatsrtpdmz.cisco.com/contiv-c2
+e0d473622395        alpine                           "/bin/sh"                5 minutes ago       Up 5 minutes                            pod07-srv2.ecatsrtpdmz.cisco.com/contiv-c1
+36f04a36338c        alpine                           "/bin/sh"                9 minutes ago       Up 8 minutes                            pod07-srv2.ecatsrtpdmz.cisco.com/vanilla-c
+7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   14 minutes ago      Up 14 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/auth-proxy
+e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  16 minutes ago      Up 16 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/etcd
+228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  16 minutes ago      Up 16 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/etc
 
 ```
 
-Let us run a couple of more containers in the host `pod3-srv1` that belong to the tenant `blue`:
+Let us run a couple of more containers in the host `pod07-srv1` that belong to the tenant `blue`:
 
 
 ```
-[root@pod3-srv1 ~]# docker run -itd --name=contiv-blue-c2 --net="contiv-net/blue" alpine /bin/sh
+[root@pod07-srv1 ~]# docker run -itd --name=contiv-blue-c2 --net="contiv-net/blue" alpine /bin/sh
 f8718d13db4ff41c539cb64fa03ffa7c0408cae57a06ec67288faaab98637851
-[root@pod3-srv1 ~]# docker run -itd --name=contiv-blue-c3 --net="contiv-net/blue" alpine /bin/sh
+[root@pod07-srv1 ~]# docker run -itd --name=contiv-blue-c3 --net="contiv-net/blue" alpine /bin/sh
 061b15039cc3e21358a32de4908d120ba21b5f6520846245ecfba7aa441a6d64
-do^H^H[root@pod3-srv1 ~]# docker ps 
+do^H^H[root@pod07-srv1 ~]# docker ps 
 CONTAINER ID        IMAGE                            COMMAND                  CREATED              STATUS              PORTS               NAMES
-061b15039cc3        alpine                           "/bin/sh"                6 seconds ago        Up 2 seconds                            pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c3
-f8718d13db4f        alpine                           "/bin/sh"                12 seconds ago       Up 8 seconds                            pod3-srv1.ecatsrtpdmz.cisco.com/contiv-blue-c2
-3b52a958a5ed        alpine                           "/bin/sh"                About a minute ago   Up About a minute                       pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
-0c9ffe9225e9        alpine                           "/bin/sh"                5 minutes ago        Up 5 minutes                            pod3-srv1.ecatsrtpdmz.cisco.com/contiv-c2
-e0d473622395        alpine                           "/bin/sh"                6 minutes ago        Up 6 minutes                            pod3-srv2.ecatsrtpdmz.cisco.com/contiv-c1
-36f04a36338c        alpine                           "/bin/sh"                10 minutes ago       Up 10 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/vanilla-c
-7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   15 minutes ago       Up 15 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/auth-proxy
-e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  17 minutes ago       Up 17 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/etcd
-228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  17 minutes ago       Up 17 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/etcd
+061b15039cc3        alpine                           "/bin/sh"                6 seconds ago        Up 2 seconds                            pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c3
+f8718d13db4f        alpine                           "/bin/sh"                12 seconds ago       Up 8 seconds                            pod07-srv1.ecatsrtpdmz.cisco.com/contiv-blue-c2
+3b52a958a5ed        alpine                           "/bin/sh"                About a minute ago   Up About a minute                       pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
+0c9ffe9225e9        alpine                           "/bin/sh"                5 minutes ago        Up 5 minutes                            pod07-srv1.ecatsrtpdmz.cisco.com/contiv-c2
+e0d473622395        alpine                           "/bin/sh"                6 minutes ago        Up 6 minutes                            pod07-srv2.ecatsrtpdmz.cisco.com/contiv-c1
+36f04a36338c        alpine                           "/bin/sh"                10 minutes ago       Up 10 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/vanilla-c
+7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   15 minutes ago       Up 15 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/auth-proxy
+e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  17 minutes ago       Up 17 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/etcd
+228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  17 minutes ago       Up 17 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/etcd
 
-[root@pod3-srv1 ~]# docker network inspect contiv-net/blue
+[root@pod07-srv1 ~]# docker network inspect contiv-net/blue
 [
     {
         "Name": "contiv-net/blue",
@@ -620,7 +620,7 @@ e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  17
     }
 ]
 
-[root@pod3-srv1 ~]# docker exec -it contiv-blue-c3 /bin/sh
+[root@pod07-srv1 ~]# docker exec -it contiv-blue-c3 /bin/sh
 / # ping contiv-blue-c1
 PING contiv-blue-c1 (40.1.2.1): 56 data bytes
 64 bytes from 40.1.2.1: seq=0 ttl=64 time=2.377 ms
@@ -657,13 +657,13 @@ Then by default communication between group is allowed. So we will have ICMP den
 Let us create Tenant and Network first.
 
 ```
-[root@pod3-srv1 ~]# netctl tenant create TestTenant
+[root@pod07-srv1 ~]# netctl tenant create TestTenant
 Creating tenant: TestTenant
 
-[root@pod3-srv1 ~]# netctl network create --tenant TestTenant --subnet=20.1.1.0/24 --gateway=20.1.1.254 TestNet
-Creating network TestTenant:TestNet
+[root@pod07-srv1 ~]# netctl network create --tenant TestTenant --subnet=20.1.1.0/24 --gateway=20.1.1.254 TestNet
+netctl net ls -aCreating network TestTenant:TestNet
 
-[root@pod3-srv1 ~]# netctl net ls -a
+[root@pod07-srv1 ~]# netctl net ls -a
 Tenant      Network     Nw Type  Encap type  Packet tag  Subnet       Gateway     IPv6Subnet  IPv6Gateway
 ------      -------     -------  ----------  ----------  -------      ------      ----------  -----------
 default     contiv-net  data     vxlan       0           30.1.2.0/24                          
@@ -676,13 +676,13 @@ Now, create two groups epgA and epgB, under network TestNet.
 
 
 ```
-[root@pod3-srv1 ~]# netctl group create -t TestTenant TestNet epgA
+[root@pod07-srv1 ~]# netctl group create -t TestTenant TestNet epgA
 Creating EndpointGroup TestTenant:epgA
 
-[root@pod3-srv1 ~]# netctl group create -t TestTenant TestNet epgB
+[root@pod07-srv1 ~]# netctl group create -t TestTenant TestNet epgB
 Creating EndpointGroup TestTenant:epgB
 
-[root@pod3-srv1 ~]# netctl group ls -a
+[root@pod07-srv1 ~]# netctl group ls -a
 Tenant      Group  Network  IP Pool   Policies  Network profile
 ------      -----  -------  --------  ---------------
 TestTenant  epgA   TestNet              
@@ -694,22 +694,22 @@ Now you will see thse groups and networks are reported as network to docker-engi
 
 
 ```
-[root@pod3-srv1 ~]# docker network ls
+[root@pod07-srv1 ~]# docker network ls
 NETWORK ID          NAME                                               DRIVER              SCOPE
 def827390629        TestNet/TestTenant                                 netplugin           global              
 d120aeb0010b        contiv-net                                         netplugin           global              
 3b592976dcaa        contiv-net/blue                                    netplugin           global              
 d2b9e4042eb5        epgA/TestTenant                                    netplugin           global              
 fd2ab7b581dd        epgB/TestTenant                                    netplugin           global              
-4c7a511c1131        pod3-srv1.ecatsrtpdmz.cisco.com/bridge            bridge              local               
-a0938130151d        pod3-srv1.ecatsrtpdmz.cisco.com/docker_gwbridge   bridge              local               
-e8be04ef7ab7        pod3-srv1.ecatsrtpdmz.cisco.com/host              host                local               
-632ec424d389        pod3-srv1.ecatsrtpdmz.cisco.com/none              null                local               
-ffa83d536aba        pod3-srv2.ecatsrtpdmz.cisco.com/bridge            bridge              local               
-f3f357171048        pod3-srv2.ecatsrtpdmz.cisco.com/docker_gwbridge   bridge              local               
-43f4fb17d806        pod3-srv2.ecatsrtpdmz.cisco.com/host              host                local               
-dce44a32c67d        pod3-srv2.ecatsrtpdmz.cisco.com/none              null                local               
-[root@pod3-srv1 ~]# 
+4c7a511c1131        pod07-srv1.ecatsrtpdmz.cisco.com/bridge            bridge              local               
+a0938130151d        pod07-srv1.ecatsrtpdmz.cisco.com/docker_gwbridge   bridge              local               
+e8be04ef7ab7        pod07-srv1.ecatsrtpdmz.cisco.com/host              host                local               
+632ec424d389        pod07-srv1.ecatsrtpdmz.cisco.com/none              null                local               
+ffa83d536aba        pod07-srv2.ecatsrtpdmz.cisco.com/bridge            bridge              local               
+f3f357171048        pod07-srv2.ecatsrtpdmz.cisco.com/docker_gwbridge   bridge              local               
+43f4fb17d806        pod07-srv2.ecatsrtpdmz.cisco.com/host              host                local               
+dce44a32c67d        pod07-srv2.ecatsrtpdmz.cisco.com/none              null                local               
+[root@pod07-srv1 ~]# 
 
 ```
 
@@ -718,25 +718,25 @@ By default, Contiv allows connectivity between groups under same network.
 
 
 ```
-[root@pod3-srv1 ~]# docker run -itd --net="epgA/TestTenant" --name=AContainer contiv/alpine sh
+[root@pod07-srv1 ~]# docker run -itd --net="epgA/TestTenant" --name=AContainer contiv/alpine sh
 3933c859740e534ed42ba4277ab3291b56d24d70ffcdb454707413a1308bac43
 
-[root@pod3-srv1 ~]# docker run -itd --net="epgB/TestTenant" --name=BContainer contiv/alpine sh
+[root@pod07-srv1 ~]# docker run -itd --net="epgB/TestTenant" --name=BContainer contiv/alpine sh
 505d20ea5b85f157a4eb10855e762b68b4ee04291c8d4b3e7ec2c587eeaacc35
 
-[root@pod3-srv1 ~]# docker ps
+[root@pod07-srv1 ~]# docker ps
 CONTAINER ID        IMAGE                            COMMAND                  CREATED             STATUS                  PORTS               NAMES
-505d20ea5b85        contiv/alpine                    "sh"                     3 seconds ago       Up Less than a second                       pod3-srv1.ecatsrtpdmz.cisco.com/BContainer
-3933c859740e        contiv/alpine                    "sh"                     14 seconds ago      Up 10 seconds                               pod3-srv2.ecatsrtpdmz.cisco.com/AContainer
-061b15039cc3        alpine                           "/bin/sh"                14 minutes ago      Up 14 minutes                               pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c3
-f8718d13db4f        alpine                           "/bin/sh"                14 minutes ago      Up 14 minutes                               pod3-srv1.ecatsrtpdmz.cisco.com/contiv-blue-c2
-3b52a958a5ed        alpine                           "/bin/sh"                15 minutes ago      Up 15 minutes                               pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
-0c9ffe9225e9        alpine                           "/bin/sh"                20 minutes ago      Up 20 minutes                               pod3-srv1.ecatsrtpdmz.cisco.com/contiv-c2
-e0d473622395        alpine                           "/bin/sh"                21 minutes ago      Up 20 minutes                               pod3-srv2.ecatsrtpdmz.cisco.com/contiv-c1
-36f04a36338c        alpine                           "/bin/sh"                24 minutes ago      Up 24 minutes                               pod3-srv2.ecatsrtpdmz.cisco.com/vanilla-c
-7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   30 minutes ago      Up 30 minutes                               pod3-srv1.ecatsrtpdmz.cisco.com/auth-proxy
-e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  31 minutes ago      Up 31 minutes                               pod3-srv2.ecatsrtpdmz.cisco.com/etcd
-228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  32 minutes ago      Up 32 minutes                               pod3-srv1.ecatsrtpdmz.cisco.com/etcd
+505d20ea5b85        contiv/alpine                    "sh"                     3 seconds ago       Up Less than a second                       pod07-srv1.ecatsrtpdmz.cisco.com/BContainer
+3933c859740e        contiv/alpine                    "sh"                     14 seconds ago      Up 10 seconds                               pod07-srv2.ecatsrtpdmz.cisco.com/AContainer
+061b15039cc3        alpine                           "/bin/sh"                14 minutes ago      Up 14 minutes                               pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c3
+f8718d13db4f        alpine                           "/bin/sh"                14 minutes ago      Up 14 minutes                               pod07-srv1.ecatsrtpdmz.cisco.com/contiv-blue-c2
+3b52a958a5ed        alpine                           "/bin/sh"                15 minutes ago      Up 15 minutes                               pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
+0c9ffe9225e9        alpine                           "/bin/sh"                20 minutes ago      Up 20 minutes                               pod07-srv1.ecatsrtpdmz.cisco.com/contiv-c2
+e0d473622395        alpine                           "/bin/sh"                21 minutes ago      Up 20 minutes                               pod07-srv2.ecatsrtpdmz.cisco.com/contiv-c1
+36f04a36338c        alpine                           "/bin/sh"                24 minutes ago      Up 24 minutes                               pod07-srv2.ecatsrtpdmz.cisco.com/vanilla-c
+7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   30 minutes ago      Up 30 minutes                               pod07-srv1.ecatsrtpdmz.cisco.com/auth-proxy
+e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  31 minutes ago      Up 31 minutes                               pod07-srv2.ecatsrtpdmz.cisco.com/etcd
+228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  32 minutes ago      Up 32 minutes                               pod07-srv1.ecatsrtpdmz.cisco.com/etcd
 
 ```
 
@@ -744,7 +744,7 @@ Now try to ping from AContainer to BContainer. They should be able to ping each 
 
 ```
 To find IP address or AContainer:
-[root@pod3-srv1 ~]# docker exec -it AContainer sh 
+[root@pod07-srv1 ~]# docker exec -it AContainer sh 
 / # ifconfig eth0
 eth0      Link encap:Ethernet  HWaddr 02:02:14:01:01:01  
           inet addr:20.1.1.1  Bcast:0.0.0.0  Mask:255.255.255.0
@@ -758,7 +758,7 @@ eth0      Link encap:Ethernet  HWaddr 02:02:14:01:01:01
 
 Now ping AContainer from BContainer
 
-[root@pod3-srv1 ~]# docker exec -it BContainer sh
+[root@pod07-srv1 ~]# docker exec -it BContainer sh
 / # ping 20.1.1.1 
 PING 20.1.1.1 (20.1.1.1) 56(84) bytes of data.
 64 bytes from 20.1.1.1: icmp_seq=1 ttl=64 time=1.73 ms
@@ -779,20 +779,20 @@ Adding policy and modifying group.
 
 ```
 
-[root@pod3-srv1 ~]# netctl policy create -t TestTenant policyAB
+[root@pod07-srv1 ~]# netctl policy create -t TestTenant policyAB
 Creating policy TestTenant:policyAB
 
-[root@pod3-srv1 ~]# netctl policy rule-add -t TestTenant -d in --protocol icmp  --from-group epgA  --action deny policyAB 1
+[root@pod07-srv1 ~]# netctl policy rule-add -t TestTenant -d in --protocol icmp  --from-group epgA  --action deny policyAB 1
 
-[root@pod3-srv1 ~]# netctl group create -t TestTenant -p policyAB TestNet epgB
+[root@pod07-srv1 ~]# netctl group create -t TestTenant -p policyAB TestNet epgB
 Creating EndpointGroup TestTenant:epgB
 
-[root@pod3-srv1 ~]# netctl policy ls -a
+[root@pod07-srv1 ~]# netctl policy ls -a
 Tenant      Policy
 ------      ------
 TestTenant  policyAB
 
-[root@pod3-srv1 ~]# netctl policy rule-ls -t TestTenant policyAB
+[root@pod07-srv1 ~]# netctl policy rule-ls -t TestTenant policyAB
 Incoming Rules:
 Rule  Priority  From EndpointGroup  From Network  From IpAddress  Protocol  Port  Action
 ----  --------  ------------------  ------------  ---------       --------  ----  ------
@@ -807,7 +807,7 @@ Now ping between containers.
 
 
 ```
-[root@pod3-srv1 ~]# docker exec -it BContainer sh
+[root@pod07-srv1 ~]# docker exec -it BContainer sh
 / # ifconfig eth0
 eth0      Link encap:Ethernet  HWaddr 02:02:14:01:01:02  
           inet addr:20.1.1.2  Bcast:0.0.0.0  Mask:255.255.255.0
@@ -836,9 +836,9 @@ Creating TCP port policy.
 
 ```
 
-[root@pod3-srv1 ~]# netctl policy rule-add -t TestTenant -d in --protocol tcp --port 8001  --from-group epgA  --action deny policyAB 2
+[root@pod07-srv1 ~]# netctl policy rule-add -t TestTenant -d in --protocol tcp --port 8001  --from-group epgA  --action deny policyAB 2
 
-[root@pod3-srv1 ~]# netctl policy rule-ls -t TestTenant policyAB
+[root@pod07-srv1 ~]# netctl policy rule-ls -t TestTenant policyAB
 Incoming Rules:
 Rule  Priority  From EndpointGroup  From Network  From IpAddress  Protocol  Port  Action
 ----  --------  ------------------  ------------  ---------       --------  ----  ------
@@ -858,7 +858,7 @@ verify using nc utility on AContainer.
 ```
 On BContainer:
 
-[root@pod3-srv1 ~]# docker exec -it BContainer sh
+[root@pod07-srv1 ~]# docker exec -it BContainer sh
 / # iperf -s -p 8001
 ------------------------------------------------------------
 Server listening on TCP port 8001
@@ -869,7 +869,7 @@ TCP window size: 85.3 KByte (default)
 
 On AContainer:
 
-[root@pod3-srv2 ~]# docker exec -it AContainer sh
+[root@pod07-srv2 ~]# docker exec -it AContainer sh
 / #  nc -zvw 1 20.1.1.2 8001 --------> here 20.1.1.2 
 is IP address of BContainer
 nc: 20.1.1.2 (20.1.1.2:8001): Operation timed out
@@ -883,7 +883,7 @@ Now, let us ensure that the other ports (e.g. 8000) are open (allowed).
 ```
 On BContainer:
 
-[root@pod3-srv1 ~]# docker exec -it BContainer sh
+[root@pod07-srv1 ~]# docker exec -it BContainer sh
 / # iperf -s -p 8000
 ------------------------------------------------------------
 Server listening on TCP port 8000
@@ -897,7 +897,7 @@ TCP window size: 85.3 KByte (default)
 
 On AContainer:
 
-[root@pod3-srv2 ~]# docker exec -it AContainer sh
+[root@pod07-srv2 ~]# docker exec -it AContainer sh
 / #  nc -zvw 1 20.1.1.2 8000 --------> here 20.1.1.2 
 is IP address of BContainer
 20.1.1.2 (20.1.1.2:8000) open 
@@ -919,16 +919,16 @@ So, let us create tenant, a network and group "A" under network.
 
 
 ```
-[root@pod3-srv2 ~]# netctl tenant create BandwidthTenant
+[root@pod07-srv2 ~]# netctl tenant create BandwidthTenant
 Creating tenant: BandwidthTenant
 
-[root@pod3-srv2 ~]# netctl network create --tenant BandwidthTenant --subnet=50.1.1.0/24 --gateway=50.1.1.254 BandwidthTestNet
+[root@pod07-srv2 ~]# netctl network create --tenant BandwidthTenant --subnet=50.1.1.0/24 --gateway=50.1.1.254 BandwidthTestNet
 Creating network BandwidthTenant:BandwidthTestNet
 
-[root@pod3-srv2 ~]# netctl group create -t BandwidthTenant BandwidthTestNet epgA
+[root@pod07-srv2 ~]# netctl group create -t BandwidthTenant BandwidthTestNet epgA
 Creating EndpointGroup BandwidthTenant:epgA
 
-[root@pod3-srv2 ~]# netctl net ls -a 
+[root@pod07-srv2 ~]# netctl net ls -a 
 Tenant           Network           Nw Type  Encap type  Packet tag  Subnet       Gateway     IPv6Subnet  IPv6Gateway
 ------           -------           -------  ----------  ----------  -------      ------      ----------  -----------
 BandwidthTenant  BandwidthTestNet  data     vxlan       0           50.1.1.0/24  50.1.1.254              
@@ -943,27 +943,27 @@ Now, We are going to run serverA and clientA containers using group epgA as a ne
 
 ```
 
-[root@pod3-srv2 ~]# docker run -itd --net="epgA/BandwidthTenant" --name=serverA contiv/alpine sh
+[root@pod07-srv2 ~]# docker run -itd --net="epgA/BandwidthTenant" --name=serverA contiv/alpine sh
 9552047f339bf37edce1e92f79143b26f47b0d3cd9146e4946d3152701dd0252
 
-[root@pod3-srv2 ~]# docker run -itd --net="epgA/BandwidthTenant" --name=clientA contiv/alpine sh
+[root@pod07-srv2 ~]# docker run -itd --net="epgA/BandwidthTenant" --name=clientA contiv/alpine sh
 36a1d8554187e033ff843382eea86a1c39fd8e2064fee01f712267b158664208
 
-[root@pod3-srv2 ~]# docker ps 
+[root@pod07-srv2 ~]# docker ps 
 CONTAINER ID        IMAGE                            COMMAND                  CREATED             STATUS              PORTS               NAMES
-36a1d8554187        contiv/alpine                    "sh"                     36 seconds ago      Up 33 seconds                           pod3-srv2.ecatsrtpdmz.cisco.com/clientA
-9552047f339b        contiv/alpine                    "sh"                     47 seconds ago      Up 44 seconds                           pod3-srv1.ecatsrtpdmz.cisco.com/serverA
-505d20ea5b85        contiv/alpine                    "sh"                     16 minutes ago      Up 16 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/BContainer
-3933c859740e        contiv/alpine                    "sh"                     16 minutes ago      Up 16 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/AContainer
-061b15039cc3        alpine                           "/bin/sh"                31 minutes ago      Up 31 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c3
-f8718d13db4f        alpine                           "/bin/sh"                31 minutes ago      Up 31 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/contiv-blue-c2
-3b52a958a5ed        alpine                           "/bin/sh"                32 minutes ago      Up 32 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
-0c9ffe9225e9        alpine                           "/bin/sh"                36 minutes ago      Up 36 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/contiv-c2
-e0d473622395        alpine                           "/bin/sh"                37 minutes ago      Up 37 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/contiv-c1
-36f04a36338c        alpine                           "/bin/sh"                41 minutes ago      Up 41 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/vanilla-c
-7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   46 minutes ago      Up 46 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/auth-proxy
-e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  48 minutes ago      Up 48 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/etcd
-228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  48 minutes ago      Up 48 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/etcd
+36a1d8554187        contiv/alpine                    "sh"                     36 seconds ago      Up 33 seconds                           pod07-srv2.ecatsrtpdmz.cisco.com/clientA
+9552047f339b        contiv/alpine                    "sh"                     47 seconds ago      Up 44 seconds                           pod07-srv1.ecatsrtpdmz.cisco.com/serverA
+505d20ea5b85        contiv/alpine                    "sh"                     16 minutes ago      Up 16 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/BContainer
+3933c859740e        contiv/alpine                    "sh"                     16 minutes ago      Up 16 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/AContainer
+061b15039cc3        alpine                           "/bin/sh"                31 minutes ago      Up 31 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c3
+f8718d13db4f        alpine                           "/bin/sh"                31 minutes ago      Up 31 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/contiv-blue-c2
+3b52a958a5ed        alpine                           "/bin/sh"                32 minutes ago      Up 32 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
+0c9ffe9225e9        alpine                           "/bin/sh"                36 minutes ago      Up 36 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/contiv-c2
+e0d473622395        alpine                           "/bin/sh"                37 minutes ago      Up 37 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/contiv-c1
+36f04a36338c        alpine                           "/bin/sh"                41 minutes ago      Up 41 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/vanilla-c
+7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   46 minutes ago      Up 46 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/auth-proxy
+e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  48 minutes ago      Up 48 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/etcd
+228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  48 minutes ago      Up 48 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/etcd
 
 ```
 
@@ -974,7 +974,7 @@ where you are running this tutorial. It may vary depending upon base OS, network
 ```
 On serverA:
 
-[root@pod3-srv2 ~]# docker exec -it serverA sh
+[root@pod07-srv2 ~]# docker exec -it serverA sh
 / # ifconfig eth0
 eth0      Link encap:Ethernet  HWaddr 02:02:32:01:01:01  
           inet addr:50.1.1.1  Bcast:0.0.0.0  Mask:255.255.255.0
@@ -999,7 +999,7 @@ UDP buffer size:  208 KByte (default)
 
 On clientA:
 
-[root@pod3-srv1 ~]# docker exec -it clientA sh
+[root@pod07-srv1 ~]# docker exec -it clientA sh
 / # iperf -c 50.1.1.1 -u
 ------------------------------------------------------------
 Client connecting to 50.1.1.1, UDP port 5001
@@ -1022,25 +1022,25 @@ we got above. So let us create netprofile with bandwidth of 500Kbits/sec.
 
 ```
 
-[root@pod3-srv2 ~]# netctl netprofile create -t BandwidthTenant -b 500Kbps -d 6 -s 80 testProfile
+[root@pod07-srv2 ~]# netctl netprofile create -t BandwidthTenant -b 500Kbps -d 6 -s 80 testProfile
 Creating netprofile BandwidthTenant:testProfile
 
-[root@pod3-srv2 ~]# netctl group create -t BandwidthTenant -n testProfile BandwidthTestNet epgB
+[root@pod07-srv2 ~]# netctl group create -t BandwidthTenant -n testProfile BandwidthTestNet epgB
 Creating EndpointGroup BandwidthTenant:epgB
 
-[root@pod3-srv2 ~]# netctl netprofile ls -a
+[root@pod07-srv2 ~]# netctl netprofile ls -a
 Name         Tenant           Bandwidth  DSCP      burst size
 ------       ------           ---------  --------  ----------
 testProfile  BandwidthTenant  500Kbps    6         80
 
-[root@pod3-srv2 ~]# netctl group ls -a
+[root@pod07-srv2 ~]# netctl group ls -a
 Tenant           Group  Network           IP Pool   Policies  Network profile
 ------           -----  -------           --------  ---------------
 TestTenant       epgA   TestNet                               
 TestTenant       epgB   TestNet                     policyAB  
 BandwidthTenant  epgA   BandwidthTestNet                      
 BandwidthTenant  epgB   BandwidthTestNet                      testProfile
-[root@pod3-srv2 ~]# 
+[root@pod07-srv2 ~]# 
 
 ```
 
@@ -1048,29 +1048,29 @@ Running clientB and serverB containers:
 
 ```
 
-[root@pod3-srv2 ~]# docker run -itd --net="epgB/BandwidthTenant" --name=serverB contiv/alpine sh
+[root@pod07-srv2 ~]# docker run -itd --net="epgB/BandwidthTenant" --name=serverB contiv/alpine sh
 7f840198595e800a1a1005eb1699fa39d4240a93ca44f37a3c9fb04a6655436e
 
-[root@pod3-srv2 ~]# docker run -itd --net="epgB/BandwidthTenant" --name=clientB contiv/alpine sh
+[root@pod07-srv2 ~]# docker run -itd --net="epgB/BandwidthTenant" --name=clientB contiv/alpine sh
 8dabce8d9e24a369de4d260d223f403ea419719d9e6f4309640373bef0e49706
 
-[root@pod3-srv2 ~]# docker ps 
+[root@pod07-srv2 ~]# docker ps 
 CONTAINER ID        IMAGE                            COMMAND                  CREATED             STATUS              PORTS               NAMES
-8dabce8d9e24        contiv/alpine                    "sh"                     5 seconds ago       Up 1 seconds                            pod3-srv2.ecatsrtpdmz.cisco.com/clientB
-7f840198595e        contiv/alpine                    "sh"                     12 seconds ago      Up 8 seconds                            pod3-srv1.ecatsrtpdmz.cisco.com/serverB
-36a1d8554187        contiv/alpine                    "sh"                     17 minutes ago      Up 17 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/clientA
-9552047f339b        contiv/alpine                    "sh"                     17 minutes ago      Up 17 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/serverA
-505d20ea5b85        contiv/alpine                    "sh"                     33 minutes ago      Up 33 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/BContainer
-3933c859740e        contiv/alpine                    "sh"                     33 minutes ago      Up 33 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/AContainer
-061b15039cc3        alpine                           "/bin/sh"                47 minutes ago      Up 47 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c3
-f8718d13db4f        alpine                           "/bin/sh"                48 minutes ago      Up 47 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/contiv-blue-c2
-3b52a958a5ed        alpine                           "/bin/sh"                49 minutes ago      Up 48 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
-0c9ffe9225e9        alpine                           "/bin/sh"                53 minutes ago      Up 53 minutes                           pod3-srv1.ecatsrtpdmz.cisco.com/contiv-c2
-e0d473622395        alpine                           "/bin/sh"                54 minutes ago      Up 54 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/contiv-c1
-36f04a36338c        alpine                           "/bin/sh"                57 minutes ago      Up 57 minutes                           pod3-srv2.ecatsrtpdmz.cisco.com/vanilla-c
-7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   About an hour ago   Up About an hour                        pod3-srv1.ecatsrtpdmz.cisco.com/auth-proxy
-e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  About an hour ago   Up About an hour                        pod3-srv2.ecatsrtpdmz.cisco.com/etcd
-228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  About an hour ago   Up About an hour                        pod3-srv1.ecatsrtpdmz.cisco.com/etcd
+8dabce8d9e24        contiv/alpine                    "sh"                     5 seconds ago       Up 1 seconds                            pod07-srv2.ecatsrtpdmz.cisco.com/clientB
+7f840198595e        contiv/alpine                    "sh"                     12 seconds ago      Up 8 seconds                            pod07-srv1.ecatsrtpdmz.cisco.com/serverB
+36a1d8554187        contiv/alpine                    "sh"                     17 minutes ago      Up 17 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/clientA
+9552047f339b        contiv/alpine                    "sh"                     17 minutes ago      Up 17 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/serverA
+505d20ea5b85        contiv/alpine                    "sh"                     33 minutes ago      Up 33 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/BContainer
+3933c859740e        contiv/alpine                    "sh"                     33 minutes ago      Up 33 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/AContainer
+061b15039cc3        alpine                           "/bin/sh"                47 minutes ago      Up 47 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c3
+f8718d13db4f        alpine                           "/bin/sh"                48 minutes ago      Up 47 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/contiv-blue-c2
+3b52a958a5ed        alpine                           "/bin/sh"                49 minutes ago      Up 48 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/contiv-blue-c1
+0c9ffe9225e9        alpine                           "/bin/sh"                53 minutes ago      Up 53 minutes                           pod07-srv1.ecatsrtpdmz.cisco.com/contiv-c2
+e0d473622395        alpine                           "/bin/sh"                54 minutes ago      Up 54 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/contiv-c1
+36f04a36338c        alpine                           "/bin/sh"                57 minutes ago      Up 57 minutes                           pod07-srv2.ecatsrtpdmz.cisco.com/vanilla-c
+7a4218de54c7        contiv/auth_proxy:1.0.0-beta.6   "./auth_proxy --tls-k"   About an hour ago   Up About an hour                        pod07-srv1.ecatsrtpdmz.cisco.com/auth-proxy
+e7b6621a8257        quay.io/coreos/etcd:v2.3.8       "/etcd"                  About an hour ago   Up About an hour                        pod07-srv2.ecatsrtpdmz.cisco.com/etcd
+228913a30a93        quay.io/coreos/etcd:v2.3.8       "/etcd"                  About an hour ago   Up About an hour                        pod07-srv1.ecatsrtpdmz.cisco.com/etcd
 ```
 
 Now as we are running clientB and serverB containers on group B network. we should see bandwidth around
@@ -1080,7 +1080,7 @@ Now as we are running clientB and serverB containers on group B network. we shou
 
 On serverB:
 
-[root@pod3-srv1 ~]# docker exec -it serverB sh
+[root@pod07-srv1 ~]# docker exec -it serverB sh
 / # ifconfig eth0
 eth0      Link encap:Ethernet  HWaddr 02:02:32:01:01:03  
           inet addr:50.1.1.3  Bcast:0.0.0.0  Mask:255.255.255.0
@@ -1104,7 +1104,7 @@ UDP buffer size:  208 KByte (default)
 
 On clientB:
 
-[root@pod3-srv2 ~]# docker exec -it clientB sh
+[root@pod07-srv2 ~]# docker exec -it clientB sh
 / # iperf -c 50.1.1.3 -u 
 ------------------------------------------------------------
 Client connecting to 50.1.1.3, UDP port 5001
