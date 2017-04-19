@@ -44,7 +44,7 @@ Update the uninstall script
 
 ```
 cd contiv-1.0.0/install/ansible
-wget https://github.com/contiv/install/releases/download/1.0.0/uninstall.sh
+wget https://github.com/contiv/install/releases/download/1.0.0/uninstall.sh -O uninstall.sh
 chmod u+x uninstall.sh
 ```
 

@@ -44,7 +44,7 @@ Update the uninstall script
 
 ```
 cd contiv-1.0.0/install/ansible
-wget https://github.com/contiv/install/releases/download/1.0.0/uninstall.sh
+wget https://github.com/contiv/install/releases/download/1.0.0/uninstall.sh -O uninstall.sh
 chmod u+x uninstall.sh
 ```
 
@@ -661,7 +661,7 @@ Let us create Tenant and Network first.
 Creating tenant: TestTenant
 
 [root@pod06-srv1 ~]# netctl network create --tenant TestTenant --subnet=20.1.1.0/24 --gateway=20.1.1.254 TestNet
-netctl net ls -aCreating network TestTenant:TestNet
+Creating network TestTenant:TestNet
 
 [root@pod06-srv1 ~]# netctl net ls -a
 Tenant      Network     Nw Type  Encap type  Packet tag  Subnet       Gateway     IPv6Subnet  IPv6Gateway
